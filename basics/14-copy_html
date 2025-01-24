@@ -1,2 +1,9 @@
 #!/bin/bash
-for file in *.html [ ! -e "../$file" ] [ "$file" -nt "../$file" ]
+# Script to copy HTML files to the parent directory if they are newer or don't exist there.
+
+for file in *.html; do
+    # Check if the file exists in the parent directory or is newer
+    if [ ! -e "../$file" ] || [ "$file" -nt "../$file" ]; then
+        cp "$file" ..
+    fi
+done
