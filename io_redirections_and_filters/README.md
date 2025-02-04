@@ -1,2 +1,1 @@
-#!/bin/bash
-echo "Hello, World"
+My 6th project
