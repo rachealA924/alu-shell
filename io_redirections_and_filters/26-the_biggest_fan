@@ -1,0 +1,11 @@
+#!/bin/bash
+
+declare -A request_count
+
+while IFS=$'\t' read -r ip _; do
+((request_count["$ip"]++))
+done
+
+for ip in "${!request_count[@]}"; do
+echo "$ip ${!request_count[@]}"
+done | sort -k2,2nr | head -n 11
