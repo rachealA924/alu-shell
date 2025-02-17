@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Loop through non-hidden files in the current directory
+for file in *; do
+    # Check if the file name contains a dash (-)
+    if [[ "$file" == *-* ]]; then
+        # Extract the part after the first dash
+        echo "${file#*-}"
+    else
+        # Print the file name as is if no dash exists
+        echo "$file"
+    fi
+done
