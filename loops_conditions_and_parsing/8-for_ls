@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Loop through non-hidden files in the current directory
 for file in *; do
