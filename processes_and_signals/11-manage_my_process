@@ -1,34 +1,48 @@
 #!/usr/bin/env bash
-#manage
-if [[ "$#" == "1" ]]
-then
-        if [[ "$1" == "start" ]]
-        then
-                ./manage_my_process &
-                echo "$!" > /var/run/my_process.pid
-                echo "manage_my_process started"
-        elif [[ "$1" == "stop" ]]
-        then
-                if test -f "/var/run/my_process.pid"
-                then
-                        kill "$(cat /var/run/my_process.pid)"
-                fi
-                rm /var/run/my_process.pid
-                echo "manage_my_process stopped"
-        elif [[ "$1" == "restart" ]]
-        then
-                # stop program
-                if test -f "/var/run/my_process.pid"
-                then
-                        kill "$(cat /var/run/my_process.pid)"
-                fi
-                # start program 
-                ./manage_my_process &
-                echo "$!" > /var/run/my_process.pid
-                echo "manage_my_process restarted"
+# Manage process
+
+PID_FILE="/var/run/my_process.pid"
+
+start_process() {
+    if [[ ! -x ./manage_my_process ]]; then
+        chmod +x ./manage_my_process
+    fi
+
+    nohup ./manage_my_process >/dev/null 2>&1 &
+    echo "$!" > "$PID_FILE"
+    echo "manage_my_process started"
+}
+
+stop_process() {
+    if test -f "$PID_FILE"; then
+        pid=$(cat "$PID_FILE")
+        if kill -0 "$pid" 2>/dev/null; then
+            kill "$pid"
+            rm "$PID_FILE"
+            echo "manage_my_process stopped"
         else
-                echo "Usage: manage_my_process {start|stop|restart}"
+            echo "Process not running, removing stale PID file"
+            rm "$PID_FILE"
         fi
+    else
+        echo "No running process found."
+    fi
+}
+
+restart_process() {
+    stop_process
+    start_process
+    echo "manage_my_process restarted"
+}
+
+if [[ "$#" == "1" ]]; then
+    case "$1" in
+        start) start_process ;;
+        stop) stop_process ;;
+        restart) restart_process ;;
+        *) echo "Usage: manage_my_process {start|stop|restart}" ;;
+    esac
 else
-        echo "Usage: manage_my_process {start|stop|restart}"
+    echo "Usage: manage_my_process {start|stop|restart}"
 fi
+
